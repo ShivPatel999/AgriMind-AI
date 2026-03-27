@@ -59,6 +59,8 @@ A professional agricultural advisor powered by **Groq AI** with RAG (Retrieval-A
 
 Run one of these commands:
 
+source venv/bin/activate 
+
 **Option A (Easiest):**
 ```bash
 ./docker-start
