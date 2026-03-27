@@ -1,0 +1,402 @@
+/* ── Design tokens ────────────────────────────────────────────────────────── */
+:root {
+  --soil:    #0F1011;
+  --bark:    #1A1B1F;
+  --wheat:   #2D7F4F;
+  --straw:   #4BA876;
+  --moss:    #2D5B46;
+  --leaf:    #3D8B5E;
+  --sage:    #5CAF7A;
+  --cream:   #FAFBFC;
+  --parch:   #E8ECEF;
+  --muted:   #8B96A4;
+  --ghost:   rgba(255,255,255,0.04);
+  --border:  rgba(93,175,122,0.15);
+  --green-b: rgba(45,127,79,0.2);
+  --rad:     14px;
+  --shadow:  0 4px 24px rgba(0,0,0,0.3);
+}
+
+/* ── Reset & base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--soil);
+  color: var(--cream);
+  overflow: hidden;
+}
+
+/* Subtle grain texture */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 5%  15%,  rgba(78,124,74,0.15)  0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 95% 85%,  rgba(200,146,42,0.10) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+header {
+  position: relative; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px;
+  background: rgba(20,12,4,0.7);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+  flex-shrink: 0;
+}
+
+.logo { display: flex; align-items: center; gap: 12px; }
+
+.logo-icon {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: linear-gradient(135deg, var(--leaf), var(--wheat));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 0 18px rgba(78,124,74,0.5);
+}
+
+.logo-text {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.3rem; letter-spacing: -0.02em; color: var(--cream);
+}
+.logo-text span { color: var(--wheat); }
+
+.tagline {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--sage); font-weight: 500;
+}
+
+.header-right { display: flex; align-items: center; gap: 10px; }
+
+.weather-badge, .rag-badge {
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px 13px; border-radius: 20px;
+  font-size: 0.75rem; color: var(--straw);
+  background: var(--ghost);
+  border: 1px solid var(--border);
+  cursor: pointer; transition: background 0.2s;
+  white-space: nowrap;
+}
+.weather-badge:hover { background: rgba(200,146,42,0.15); }
+.rag-badge           { cursor: default; }
+
+.dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--sage); animation: pulse 2s infinite;
+}
+.dot.loading { background: var(--wheat); }
+.dot.error   { background: #e05a5a; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+/* ── Weather Panel ────────────────────────────────────────────────────────── */
+#weather-panel {
+  position: relative; z-index: 15;
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.35s ease;
+  background: rgba(16,10,4,0.8);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+#weather-panel.open { max-height: 320px; }
+
+#weather-inner { padding: 14px 24px 18px; max-width: 860px; margin: 0 auto; }
+
+.weather-title {
+  font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--wheat); font-weight: 600;
+  margin-bottom: 10px;
+}
+
+#location-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--ghost);
+  border: 1px solid var(--green-b);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+#location-bar input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
+}
+#location-bar input::placeholder { color: rgba(158,140,110,0.5); }
+
+#loc-btn {
+  background: var(--green-b); border: 1px solid rgba(78,124,74,0.5);
+  color: var(--sage); border-radius: 7px; padding: 5px 12px;
+  font-size: 0.74rem; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; white-space: nowrap; transition: all 0.2s;
+}
+#loc-btn:hover { background: rgba(78,124,74,0.45); color: var(--cream); }
+
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px; margin-bottom: 10px;
+}
+
+.weather-card {
+  background: rgba(78,124,74,0.1);
+  border: 1px solid rgba(78,124,74,0.2);
+  border-radius: 10px; padding: 10px 12px; text-align: center;
+}
+.weather-card .wc-label { font-size:0.62rem; color:var(--sage); text-transform:uppercase; letter-spacing:0.07em; }
+.weather-card .wc-value { font-size:1.2rem; font-weight:600; color:var(--cream); margin-top:3px; }
+.weather-card .wc-sub   { font-size:0.67rem; color:var(--straw); margin-top:2px; }
+
+/* Retry button inside error bubbles */
+.retry-btn {
+  margin-left: 12px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--cream);
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.retry-btn:hover { background: rgba(255,255,255,0.03); }
+
+.weather-flags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.flag-pill {
+  background: rgba(200,146,42,0.12);
+  border: 1px solid rgba(200,146,42,0.3);
+  border-radius: 20px; padding: 4px 10px;
+  font-size: 0.72rem; color: var(--straw);
+}
+
+/* ── Main layout ──────────────────────────────────────────────────────────── */
+main {
+  position: relative; z-index: 5;
+  flex: 1; display: flex; flex-direction: column;
+  max-width: 860px; width: 100%; margin: 0 auto;
+  padding: 0 20px;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+}
+
+/* ── Chat area ────────────────────────────────────────────────────────────── */
+#chat-area {
+  flex: 1; overflow-y: auto;
+  padding: 20px 0 10px;
+  display: flex; flex-direction: column;
+  gap: 18px; scroll-behavior: smooth;
+}
+
+#chat-area::-webkit-scrollbar { width: 3px; }
+#chat-area::-webkit-scrollbar-thumb { background: rgba(200,146,42,0.25); border-radius: 3px; }
+
+/* ── Welcome screen ───────────────────────────────────────────────────────── */
+#welcome {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; flex: 1; text-align: center;
+  padding: 24px 8px; animation: fadeUp 0.5s ease;
+}
+
+.welcome-icon {
+  font-size: 2.8rem; margin-bottom: 16px;
+  filter: drop-shadow(0 0 20px rgba(200,146,42,0.4));
+}
+
+#welcome h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  line-height: 1.15; margin-bottom: 10px;
+}
+#welcome h1 em { color: var(--wheat); font-style: italic; }
+
+#welcome p {
+  color: var(--muted); font-size: 0.86rem;
+  max-width: 420px; line-height: 1.65; margin-bottom: 26px;
+}
+
+.starter-chips {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+  max-width: 560px;
+}
+
+.chip {
+  background: rgba(78,124,74,0.12);
+  border: 1px solid rgba(78,124,74,0.3);
+  color: var(--sage); border-radius: 20px;
+  padding: 7px 14px; font-size: 0.77rem;
+  cursor: pointer; transition: all 0.18s; white-space: nowrap;
+}
+.chip:hover {
+  background: rgba(78,124,74,0.28); color: var(--cream);
+  border-color: var(--leaf); transform: translateY(-1px);
+}
+
+/* ── Message bubbles ──────────────────────────────────────────────────────── */
+.msg { display: flex; gap: 10px; animation: fadeUp 0.25s ease; }
+.msg.user { flex-direction: row-reverse; }
+
+.avatar {
+  width: 32px; height: 32px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0; align-self: flex-end;
+}
+.avatar.bot  { background: linear-gradient(135deg, var(--leaf), var(--wheat)); box-shadow: 0 0 10px rgba(78,124,74,0.4); }
+.avatar.user-av { background: var(--bark); border: 1px solid var(--border); }
+
+.bubble {
+  max-width: calc(100% - 52px);
+  padding: 13px 16px; border-radius: var(--rad);
+  font-size: 0.875rem; line-height: 1.7;
+}
+
+.msg.bot  .bubble {
+  background: rgba(30,18,8,0.85);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 3px;
+  backdrop-filter: blur(8px);
+}
+.msg.user .bubble {
+  background: var(--green-b);
+  border: 1px solid rgba(78,124,74,0.4);
+  border-bottom-right-radius: 3px;
+  text-align: right;
+}
+
+/* ── Rich bot message formatting ──────────────────────────────────────────── */
+
+/* Section headers (### 🔍 Situation Summary) */
+.bubble .md-h3 {
+  display: flex; align-items: center; gap: 6px;
+  margin: 14px 0 6px;
+  padding: 5px 12px 5px 10px;
+  background: rgba(78,124,74,0.15);
+  border-left: 3px solid var(--leaf);
+  border-radius: 0 7px 7px 0;
+  font-size: 0.78rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.07em; color: var(--sage);
+}
+.bubble .md-h3:first-child { margin-top: 2px; }
+
+/* Bold and italic */
+.bubble strong { color: var(--wheat); font-weight: 600; }
+.bubble em     { color: var(--straw); font-style: italic; }
+
+/* Ordered and unordered lists */
+.bubble ul, .bubble ol { padding-left: 20px; margin: 5px 0; }
+.bubble li { margin: 3px 0; color: var(--parch); }
+.bubble ol li { list-style: decimal; }
+.bubble ul li { list-style: disc; }
+
+/* Horizontal rule */
+.bubble hr {
+  border: none; border-top: 1px solid rgba(200,146,42,0.15);
+  margin: 12px 0;
+}
+
+/* AgriMind Tip box */
+.bubble .tip-box {
+  margin-top: 12px; padding: 10px 14px;
+  background: rgba(200,146,42,0.1);
+  border: 1px solid rgba(200,146,42,0.28);
+  border-radius: 9px; font-size: 0.82rem;
+  color: var(--straw); line-height: 1.6;
+}
+
+/* Watch out warning box */
+.bubble .warn-box {
+  margin-top: 8px; padding: 8px 12px;
+  background: rgba(224,90,90,0.08);
+  border: 1px solid rgba(224,90,90,0.2);
+  border-radius: 8px; font-size: 0.81rem;
+  color: #e8a0a0; line-height: 1.55;
+}
+
+/* Code / numbers inline */
+.bubble code {
+  background: rgba(78,124,74,0.2);
+  border-radius: 4px; padding: 1px 5px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem; color: var(--sage);
+}
+
+/* Paragraph spacing */
+.bubble p { margin: 6px 0; }
+.bubble p:first-child { margin-top: 0; }
+
+/* ── Typing indicator ─────────────────────────────────────────────────────── */
+.typing {
+  display: flex; gap: 5px; align-items: center;
+  padding: 12px 16px;
+}
+.typing span {
+  width: 7px; height: 7px;
+  background: var(--leaf); border-radius: 50%;
+  animation: bounce 1.2s infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.18s; }
+.typing span:nth-child(3) { animation-delay: 0.36s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+/* ── Input area ───────────────────────────────────────────────────────────── */
+#input-area { padding: 10px 0 18px; flex-shrink: 0; }
+
+.input-row {
+  display: flex; gap: 9px; align-items: flex-end;
+  background: rgba(20,12,4,0.8);
+  border: 1px solid var(--border);
+  border-radius: 15px; padding: 9px 12px;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.2s;
+}
+.input-row:focus-within { border-color: rgba(78,124,74,0.55); }
+
+#user-input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--cream); font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem; resize: none;
+  min-height: 22px; max-height: 140px; line-height: 1.55;
+  padding: 2px 0;
+}
+#user-input::placeholder { color: rgba(158,140,110,0.45); }
+
+#send-btn {
+  width: 36px; height: 36px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--moss), var(--leaf));
+  border: none; border-radius: 10px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+  box-shadow: 0 2px 10px rgba(46,77,44,0.5);
+}
+#send-btn:hover  { transform: scale(1.07); box-shadow: 0 4px 16px rgba(46,77,44,0.7); }
+#send-btn:active { transform: scale(0.95); }
+#send-btn svg    { width: 15px; height: 15px; fill: #fff; }
+#send-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.input-footer {
+  display: flex; justify-content: space-between;
+  padding: 5px 4px 0;
+  font-size: 0.66rem; color: rgba(158,140,110,0.45);
+}
+
+/* ── Error toast ──────────────────────────────────────────────────────────── */
+.error-bubble {
+  background: rgba(224,90,90,0.12);
+  border: 1px solid rgba(224,90,90,0.3);
+  color: #e8a0a0;
+}
+
+/* ── Animations ───────────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(12px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  header { padding: 12px 16px; }
+  main   { padding: 0 12px; }
+  .header-right .rag-badge { display: none; }
+  .weather-grid { grid-template-columns: repeat(3, 1fr); }
+  .starter-chips .chip { font-size: 0.72rem; }
+}

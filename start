@@ -1,0 +1,34 @@
+#!/bin/bash
+# AgriMind AI – Quick Start
+
+cd "$(dirname "$0")"
+
+# Check .env
+if [ ! -f ".env" ]; then
+    echo "❌ Error: .env file not found"
+    echo "Create .env with: GROQ_API_KEY=your_key_here"
+    echo "Get your key: https://console.groq.com"
+    exit 1
+fi
+
+# Activate venv and start
+source venv/bin/activate 2>/dev/null || python3 -m venv venv && source venv/bin/activate
+
+echo "🌾 Starting AgriMind AI..."
+echo ""
+
+uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000 2>&1 | tee /tmp/agrimind.log &
+SERVER_PID=$!
+
+sleep 2
+
+if grep -q "Uvicorn running" /tmp/agrimind.log 2>/dev/null; then
+    echo "✓ Server is running!"
+    echo ""
+    echo "🌐 Open: http://127.0.0.1:8000"
+    echo "📚 Docs:  http://127.0.0.1:8000/docs"
+    echo ""
+    wait $SERVER_PID
+else
+    wait $SERVER_PID
+fi

@@ -1,0 +1,18 @@
+services:
+  agrimind:
+    build: .
+    container_name: agrimind-ai
+    restart: unless-stopped
+    ports:
+      - "8000:8000"          # Access at http://localhost:8000
+    env_file:
+      - .env                  # Must contain GROQ_API_KEY=your_key
+    volumes:
+      - hf_cache:/cache/huggingface
+    environment:
+      - PYTHONUNBUFFERED=1
+      - HF_HOME=/cache/huggingface
+
+volumes:
+  hf_cache:
+    driver: local

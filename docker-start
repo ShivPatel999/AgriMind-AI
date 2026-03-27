@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# AgriMind AI – Docker Startup
+
+set -e
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$PROJECT_ROOT"
+
+echo "🌾 AgriMind AI – Starting with Docker...\n"
+
+# Check for .env file
+if [ ! -f ".env" ]; then
+    echo "❌ Error: .env file not found"
+    echo ""
+    echo "Create .env with:"
+    echo "  GROQ_API_KEY=your_actual_key_here"
+    echo ""
+    echo "Get your key: https://console.groq.com"
+    exit 1
+fi
+
+# Check if Docker is installed
+if ! command -v docker &> /dev/null; then
+    echo "❌ Error: Docker is not installed"
+    echo "Install Docker: https://docker.com/products/docker-desktop"
+    exit 1
+fi
+
+echo "Building and starting AgriMind AI...\n"
+
+docker-compose up --build
+
+echo ""
+echo "✓ AgriMind AI is running!"
+echo ""
+echo "🌐 Open: http://localhost:8000"
+echo "📚 Docs:  http://localhost:8000/docs"
+echo ""
+echo "Press CTRL+C to stop"

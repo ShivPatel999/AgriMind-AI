@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgriMind AI – Smarter Decisions, Bigger Yields</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────────────────── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🌾</div>
+    <div>
+      <div class="logo-text">Agri<span>Mind</span> AI</div>
+      <div class="tagline">Smarter Decisions, Bigger Yields</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div id="rag-badge" class="rag-badge" title="Knowledge base status">
+      <span class="dot"></span>
+      <span id="rag-label">Loading…</span>
+    </div>
+    <div class="weather-badge" onclick="toggleWeather()" title="Toggle weather panel">
+      <span class="dot"></span>
+      <span id="weather-label">Live Weather</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── Weather Panel ───────────────────────────────────────────────────── -->
+<div id="weather-panel">
+  <div id="weather-inner">
+    <div class="weather-title">📡 Current Conditions</div>
+    <div id="location-bar">
+      <span>📍</span>
+      <input id="loc-input" placeholder="City, Country — e.g. Nairobi, Kenya" autocomplete="off" onkeydown="if(event.key==='Enter') fetchWeather()" />
+      <button id="loc-btn" onclick="fetchWeather()">Fetch Weather</button>
+    </div>
+    <div id="weather-cards" class="weather-grid" style="display:none"></div>
+    <div id="weather-flags" class="weather-flags" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ── Main ────────────────────────────────────────────────────────────── -->
+<main>
+
+  <!-- Chat history -->
+  <div id="chat-area">
+    <div id="welcome">
+      <div class="welcome-icon">🌾</div>
+      <h1>Your field, our <em>intelligence</em>.</h1>
+      <p>Describe your farm, crop, soil, or any agriculture challenge and get science-backed, weather-aware advice powered by agricultural datasets.</p>
+      <div class="starter-chips">
+        <div class="chip" onclick="sendStarter(this)">🌽 5 acres of maize in clay soil — maximize yield</div>
+        <div class="chip" onclick="sendStarter(this)">🌾 Best crops for dry tropical climate?</div>
+        <div class="chip" onclick="sendStarter(this)">💧 Irrigation plan for a loamy soil wheat farm</div>
+        <div class="chip" onclick="sendStarter(this)">🐛 Organic pest control for vegetable garden</div>
+        <div class="chip" onclick="sendStarter(this)">📅 When should I plant this season in the tropics?</div>
+        <div class="chip" onclick="sendStarter(this)">🌱 How do I improve soil fertility naturally?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div id="input-area">
+    <div class="input-row">
+      <textarea
+        id="user-input"
+        placeholder="Describe your farm, crop, or ask any agriculture question…"
+        rows="1"
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"
+      ></textarea>
+      <button id="send-btn" onclick="sendMessage()" title="Send (Enter)">
+        <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+      </button>
+    </div>
+    <div class="input-footer">
+      <span>AgriMind AI v2 · Groq + RAG · OpenMeteo Weather</span>
+      <span>Shift+Enter for new line</span>
+    </div>
+  </div>
+
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
